@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор НДФЛ с процентов по вкладам в 2026 году</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1>НДФЛ с процентов по вкладам в 2026 году</h1>
+      <p class="hero__subtitle">
+        Посчитайте налог по всем вкладам за год и поймите, почему выходит именно такая сумма.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card" aria-labelledby="calc-title">
+      <h2 id="calc-title">Данные для расчёта</h2>
+
+      <div class="field field--key-rate">
+        <label for="key-rate">Ключевая ставка, % годовых</label>
+        <input
+          id="key-rate"
+          type="text"
+          inputmode="decimal"
+          value="16,00"
+          autocomplete="off"
+        />
+        <p class="hint">
+          Максимальная ключевая ставка ЦБ РФ, действовавшая на 1-е число каждого месяца
+          налогового периода. Актуальное значение — на
+          <a href="https://www.cbr.ru/hd_base/keyrate/" target="_blank" rel="noopener">cbr.ru</a>.
+        </p>
+      </div>
+
+      <div class="deposits-header">
+        <h3>Вклады</h3>
+        <button type="button" id="add-deposit" class="btn btn--ghost">+ Добавить вклад</button>
+      </div>
+      <p class="hint">Проценты по вкладам считаются в рублях.</p>
+
+      <div id="deposits"></div>
+
+      <div id="form-errors" class="errors" hidden></div>
+
+      <div class="actions">
+        <button type="button" id="calculate" class="btn btn--primary">Рассчитать</button>
+      </div>
+    </section>
+
+    <section id="result" class="card result" aria-labelledby="result-title" hidden>
+      <div class="result-head">
+        <h2 id="result-title">Ваш расчёт НДФЛ с процентов по вкладам за 2026 год</h2>
+        <button type="button" id="print-report" class="btn btn--ghost">Распечатать отчёт</button>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat__label">Необлагаемый лимит</div>
+          <div class="stat__value" id="r-limit"></div>
+          <div class="stat__note" id="r-limit-note"></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat__label">Облагаемая сумма</div>
+          <div class="stat__value" id="r-base"></div>
+          <div class="stat__note" id="r-base-note"></div>
+        </div>
+
+        <div class="stat stat--accent">
+          <div class="stat__label">Налог к уплате</div>
+          <div class="stat__value" id="r-tax"></div>
+          <div class="stat__split" id="r-tax-split"></div>
+          <div class="stat__note" id="r-tax-note"></div>
+        </div>
+      </div>
+
+      <h3>Разбивка по вкладам</h3>
+      <div class="table-wrap">
+        <table class="breakdown">
+          <thead>
+            <tr>
+              <th>Вклад</th>
+              <th>Проценты за год</th>
+              <th>Учтено в расчёте</th>
+              <th>Налог по вкладу</th>
+            </tr>
+          </thead>
+          <tbody id="r-breakdown">
+            <tr class="is-total">
+              <td>Итого</td>
+              <td class="num" id="r-total-gross"></td>
+              <td class="num" id="r-taxable-interest"></td>
+              <td class="num" id="r-total-tax"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="explanation">
+        <h3>Простыми словами</h3>
+        <div id="r-explanation"></div>
+      </div>
+
+      <div class="deadline">
+        <h3>Когда платить?</h3>
+        <p>
+          Налог платится по уведомлению ФНС — не позднее
+          <strong>1 декабря года, следующего за отчётным</strong>. Налог за проценты 2026 года —
+          до <strong>1 декабря 2027 года</strong>. Налог рассчитывает сама ФНС и присылает
+          уведомление в личный кабинет; подавать декларацию по вкладам не нужно.
+        </p>
+      </div>
+    </section>
+
+    <section id="lead" class="card lead" aria-labelledby="lead-title" hidden>
+      <h2 id="lead-title">Хотите, чтобы налог проверил бухгалтер?</h2>
+      <p class="lead__subtitle">
+        Оставьте контакты — перезвоним и проверим расчёт бесплатно.
+      </p>
+
+      <form id="lead-form" novalidate>
+        <div class="field">
+          <label for="lead-name">Имя</label>
+          <input id="lead-name" name="name" type="text" autocomplete="name" maxlength="50" />
+        </div>
+
+        <div class="field">
+          <label for="lead-phone">Телефон</label>
+          <input
+            id="lead-phone"
+            name="phone"
+            type="tel"
+            inputmode="tel"
+            placeholder="+7 (___) ___-__-__"
+            autocomplete="tel"
+          />
+        </div>
+
+        <label class="checkbox">
+          <input id="lead-consent" type="checkbox" />
+          <span>Согласен на обработку персональных данных</span>
+        </label>
+
+        <div id="lead-errors" class="errors" hidden></div>
+
+        <button type="submit" id="lead-submit" class="btn btn--primary">Отправить</button>
+      </form>
+
+      <div id="lead-success" class="lead__success" hidden>
+        Спасибо! Бухгалтер свяжется с вами в течение рабочего дня.
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Расчёт носит информационный характер и не заменяет консультацию бухгалтера.</p>
+      <p><a href="leads.html">Демо: сохранённые заявки →</a>
+        <span class="footer__note">хранятся в этом браузере без пароля, удаляются через 72 часа</span></p>
+    </div>
+  </footer>
+
+  <template id="deposit-template">
+    <div class="deposit">
+      <div class="deposit__head">
+        <span class="deposit__title">Вклад</span>
+        <button type="button" class="btn btn--link remove-deposit">Удалить</button>
+      </div>
+
+      <div class="deposit__grid">
+        <div class="field">
+          <label>Банк</label>
+          <input type="text" class="d-bank" maxlength="100" placeholder="Название банка" />
+        </div>
+
+        <div class="field">
+          <label>Сумма процентов за год, ₽</label>
+          <input type="text" inputmode="decimal" class="d-amount" placeholder="0,00" autocomplete="off" maxlength="20" />
+          <p class="hint">Сумма именно процентов за год, а не сумма вклада. Разряды разделяются автоматически.</p>
+        </div>
+      </div>
+
+      <label class="checkbox d-exempt-label">
+        <input type="checkbox" class="d-exempt" />
+        <span>Не облагается: вклад со ставкой ≤ 1% годовых или счёт эскроу</span>
+      </label>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
