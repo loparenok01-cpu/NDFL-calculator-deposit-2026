@@ -319,6 +319,39 @@ check("TTL: при отправке старая вычищена", afterSave.so
 check("TTL: при отправке свежая осталась", afterSave.some((l) => l.name === "Свежая"), "true");
 check("TTL: новый лид записан первым", afterSave[0] && afterSave[0].name, "Новый");
 
+console.log("\n== 18. Сбой сохранения заявки (находка 3.1) ==");
+const domFail = load("index.html", "app.js", []);
+const wFail = domFail.window;
+const docFail = wFail.document;
+calcTax(domFail, ["100000", "90000"]);
+docFail.getElementById("lead-name").value = "Пётр Петров";
+docFail.getElementById("lead-phone").value = "+7 (999) 777-88-99";
+docFail.getElementById("lead-consent").checked = true;
+const storageProto = Object.getPrototypeOf(wFail.localStorage);
+const origSetItem = storageProto.setItem;
+Object.defineProperty(storageProto, "setItem", {
+  value: function () { throw new Error("quota"); },
+  configurable: true,
+  writable: true
+});
+let consoleErrCalled = false;
+const origConsoleError = wFail.console.error;
+wFail.console.error = function () { consoleErrCalled = true; };
+docFail.getElementById("lead-form").dispatchEvent(new wFail.Event("submit", { bubbles: true, cancelable: true }));
+Object.defineProperty(storageProto, "setItem", {
+  value: origSetItem,
+  configurable: true,
+  writable: true
+});
+wFail.console.error = origConsoleError;
+check("сбой: показана ошибка", docFail.getElementById("lead-errors").hidden, "false");
+check("сбой: текст ошибки про сохранение",
+  docFail.getElementById("lead-errors").textContent.includes("Не удалось сохранить заявку"), "true");
+check("сбой: успех не показан", docFail.getElementById("lead-success").hidden, "true");
+check("сбой: форма не скрыта", docFail.getElementById("lead-form").hidden, "false");
+check("сбой: кнопка снова активна", docFail.getElementById("lead-submit").disabled, "false");
+check("сбой: console.error вызван", consoleErrCalled, "true");
+
 setTimeout(() => {
   check("вызов печати в новом окне", printCalled, "true");
   console.log("\n" + (failures === 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО: " + failures));

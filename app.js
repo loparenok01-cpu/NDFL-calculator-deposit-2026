@@ -542,8 +542,13 @@ leadForm.addEventListener("submit", (e) => {
 
   if (!CONFIG.LEAD_ENDPOINT) {
     // демо-режим: эндпоинт не задан, сохраняем заявку локально
-    saveDemoLead(payload);
-    onLeadSuccess();
+    if (saveDemoLead(payload)) {
+      onLeadSuccess();
+    } else {
+      leadSubmit.disabled = false;
+      leadErrors.innerHTML = "<ul><li>Не удалось сохранить заявку на этом устройстве. Освободите место в браузере и попробуйте ещё раз или позвоните нам.</li></ul>";
+      leadErrors.hidden = false;
+    }
     return;
   }
 
@@ -587,12 +592,14 @@ function getDemoLeads() {
 }
 
 function saveDemoLead(payload) {
-  const leads = getDemoLeads();
-  leads.unshift(payload);
   try {
+    const leads = getDemoLeads();
+    leads.unshift(payload);
     localStorage.setItem(CONFIG.DEMO_LEADS_KEY, JSON.stringify(leads));
+    return true;
   } catch (e) {
-    /* localStorage недоступен — молча пропускаем */
+    console.error("Не удалось сохранить заявку (localStorage):", e);
+    return false;
   }
 }
 
