@@ -352,6 +352,36 @@ check("сбой: форма не скрыта", docFail.getElementById("lead-for
 check("сбой: кнопка снова активна", docFail.getElementById("lead-submit").disabled, "false");
 check("сбой: console.error вызван", consoleErrCalled, "true");
 
+console.log("\n== 19. escapeHtml: одинарная кавычка (находка 5.1) ==");
+const escHtmlSrc = fs.readFileSync(PATH + "app.js", "utf8") + "\n;window.__esc = escapeHtml;";
+const domEsc1 = load("index.html", null, []);
+domEsc1.window.eval(escHtmlSrc);
+const esc = domEsc1.window.__esc;
+check("кавычка экранирована", esc("O'Brien"), "O&#39;Brien");
+check("полный набор: & < > \" '",
+  esc("&<>\"'"), "&amp;&lt;&gt;&quot;&#39;");
+check("двойная кавычка в атрибутном контексте",
+  esc("<img src='x' onerror=alert(1)>"),
+  "&lt;img src=&#39;x&#39; onerror=alert(1)&gt;");
+
+doc.querySelectorAll(".d-bank")[0].value = "O'Brien & Co";
+calcTax(dom, ["100000", "90000"], [RUB, RUB]);
+const bankCell = doc.querySelector("#r-breakdown tr:not(.is-total) td");
+check("текст ячейки восстановлен", bankCell.textContent.includes("O'Brien & Co"), "true");
+doc.querySelectorAll(".d-bank")[0].value = "Абстрактный банк №1";
+
+const leadsEscSrc = fs.readFileSync(PATH + "leads.js", "utf8") + "\n;window.__esc = escapeHtml;";
+const domEsc = load("leads.html", null, []);
+const wEsc = domEsc.window;
+wEsc.localStorage.setItem("ndfl_leads_demo", JSON.stringify([
+  { name: "O'Brien", phone: "+7 (999) 123-45-67", calc_result: { limit: 1, taxable_base: 2, tax: 3 },
+    page: "ndfl-interest-2026", created_at: new Date().toISOString() }
+]));
+wEsc.eval(leadsEscSrc);
+check("leads: кавычка экранирована", wEsc.__esc("it's"), "it&#39;s");
+check("leads: текст имени восстановлен",
+  wEsc.document.querySelector("#leads-body tr td:nth-child(2)").textContent, "O'Brien");
+
 setTimeout(() => {
   check("вызов печати в новом окне", printCalled, "true");
   console.log("\n" + (failures === 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО: " + failures));
