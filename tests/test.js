@@ -278,6 +278,47 @@ check("ставка Infinity: ошибка про ставку", r.errors.some((
 check("ставка Infinity: результат скрыт", r.visible, "false");
 doc.getElementById("key-rate").value = "16";
 
+console.log("\n== 17. TTL 72 часа (находка 2.1) ==");
+const nowTs = Date.now();
+const mkLead = (name, ageH) => ({
+  name: name,
+  phone: "+7 (999) 000-00-00",
+  calc_result: { limit: 0, taxable_base: 0, tax: 0 },
+  page: "ndfl-interest-2026",
+  created_at: new Date(nowTs - ageH * 3600 * 1000).toISOString()
+});
+const domTtl = load("leads.html", null, []);
+const wTtl = domTtl.window;
+wTtl.localStorage.setItem("ndfl_leads_demo", JSON.stringify([
+  mkLead("Старая", 80), mkLead("На границе", 71), mkLead("Свежая", 1)
+]));
+wTtl.eval(fs.readFileSync(PATH + "leads.js", "utf8"));
+const docTtl = wTtl.document;
+const ttlNames = [...docTtl.querySelectorAll("#leads-body tr")].map((tr) => tr.cells[1].textContent);
+check("TTL: строк в таблице после фильтра", ttlNames.length, 2);
+check("TTL: заявка в 80 ч скрыта", ttlNames.includes("Старая"), "false");
+check("TTL: заявка в 71 ч видна", ttlNames.includes("На границе"), "true");
+check("TTL: свежая заявка видна", ttlNames.includes("Свежая"), "true");
+const afterTtl = JSON.parse(wTtl.localStorage.getItem("ndfl_leads_demo") || "[]");
+check("TTL: просроченная удалена из localStorage", afterTtl.length, 2);
+check("TTL: счётчик показывает 2", docTtl.getElementById("leads-count").textContent, "2");
+
+const domTtl2 = load("index.html", "app.js", []);
+const wT2 = domTtl2.window;
+wT2.localStorage.setItem("ndfl_leads_demo", JSON.stringify([
+  mkLead("Старая", 80), mkLead("Свежая", 1)
+]));
+calcTax(domTtl2, ["100000", "90000"]);
+const docT2 = wT2.document;
+docT2.getElementById("lead-name").value = "Новый";
+docT2.getElementById("lead-phone").value = "+7 (999) 111-22-33";
+docT2.getElementById("lead-consent").checked = true;
+docT2.getElementById("lead-form").dispatchEvent(new wT2.Event("submit", { bubbles: true, cancelable: true }));
+const afterSave = JSON.parse(wT2.localStorage.getItem("ndfl_leads_demo") || "[]");
+check("TTL: при отправке старая вычищена", afterSave.some((l) => l.name === "Старая"), "false");
+check("TTL: при отправке свежая осталась", afterSave.some((l) => l.name === "Свежая"), "true");
+check("TTL: новый лид записан первым", afterSave[0] && afterSave[0].name, "Новый");
+
 setTimeout(() => {
   check("вызов печати в новом окне", printCalled, "true");
   console.log("\n" + (failures === 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО: " + failures));

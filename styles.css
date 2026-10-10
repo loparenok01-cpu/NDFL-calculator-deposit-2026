@@ -431,6 +431,11 @@ select.invalid {
   color: var(--primary-dark);
 }
 
+.footer__note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .leads-head {
   display: flex;
   align-items: center;

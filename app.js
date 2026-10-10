@@ -12,7 +12,8 @@ const CONFIG = {
   RATE_BASE: 0.13,
   RATE_HIGH: 0.15,
   LEAD_ENDPOINT: "",     // укажите URL эндпоинта; пусто = демо-режим (localStorage)
-  DEMO_LEADS_KEY: "ndfl_leads_demo"
+  DEMO_LEADS_KEY: "ndfl_leads_demo",
+  DEMO_LEADS_TTL_MS: 72 * 60 * 60 * 1000 // демо-заявки хранятся 72 часа
 };
 
 // Абстрактный пример данных для заполнения формы
@@ -569,9 +570,17 @@ function onLeadSuccess() {
 
 /* ---------- Сохранение заявок (демо, localStorage) ---------- */
 
+function isLeadFresh(lead, now) {
+  if (!lead) return false;
+  const ts = Date.parse(lead.created_at);
+  return Number.isFinite(ts) && now - ts <= CONFIG.DEMO_LEADS_TTL_MS;
+}
+
 function getDemoLeads() {
   try {
-    return JSON.parse(localStorage.getItem(CONFIG.DEMO_LEADS_KEY)) || [];
+    const leads = JSON.parse(localStorage.getItem(CONFIG.DEMO_LEADS_KEY)) || [];
+    const now = Date.now();
+    return leads.filter((lead) => isLeadFresh(lead, now));
   } catch (e) {
     return [];
   }

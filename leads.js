@@ -3,6 +3,7 @@
 /* Страница просмотра сохранённых заявок (демо-режим, localStorage) */
 
 const DEMO_LEADS_KEY = "ndfl_leads_demo";
+const DEMO_LEADS_TTL_MS = 72 * 60 * 60 * 1000; // демо-заявки хранятся 72 часа
 
 const moneyFmt = new Intl.NumberFormat("ru-RU", {
   minimumFractionDigits: 2,
@@ -27,9 +28,22 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
+function isLeadFresh(lead, now) {
+  if (!lead) return false;
+  const ts = Date.parse(lead.created_at);
+  return Number.isFinite(ts) && now - ts <= DEMO_LEADS_TTL_MS;
+}
+
 function getLeads() {
   try {
-    return JSON.parse(localStorage.getItem(DEMO_LEADS_KEY)) || [];
+    const raw = JSON.parse(localStorage.getItem(DEMO_LEADS_KEY)) || [];
+    const now = Date.now();
+    const fresh = raw.filter((lead) => isLeadFresh(lead, now));
+    if (fresh.length !== raw.length) {
+      // физически удаляем просроченные заявки из хранилища
+      localStorage.setItem(DEMO_LEADS_KEY, JSON.stringify(fresh));
+    }
+    return fresh;
   } catch (e) {
     return [];
   }
