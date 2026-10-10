@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Заявки — Демо-режим</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1>Сохранённые заявки</h1>
+      <p class="hero__subtitle">
+        Демо-режим: заявки хранятся в localStorage этого браузера и никуда не отправляются.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="leads-head">
+        <h2>Заявки (<span id="leads-count">0</span>)</h2>
+        <div class="leads-head__actions">
+          <a class="btn btn--ghost" href="index.html">← К калькулятору</a>
+          <button type="button" id="clear-leads" class="btn btn--link">Очистить</button>
+        </div>
+      </div>
+
+      <div id="leads-empty" class="leads-empty" hidden>
+        Заявок пока нет. Отправьте форму на странице <a href="index.html">калькулятора</a>.
+      </div>
+
+      <div class="table-wrap">
+        <table class="breakdown" id="leads-table">
+          <thead>
+            <tr>
+              <th>Дата и время</th>
+              <th>Имя</th>
+              <th>Телефон</th>
+              <th>Лимит</th>
+              <th>Облагаемая сумма</th>
+              <th>Налог</th>
+            </tr>
+          </thead>
+          <tbody id="leads-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Чтобы отправлять заявки на сервер, укажите <code>LEAD_ENDPOINT</code> в <code>app.js</code>.</p>
+    </div>
+  </footer>
+
+  <script src="leads.js"></script>
+</body>
+</html>
