@@ -382,6 +382,15 @@ check("leads: кавычка экранирована", wEsc.__esc("it's"), "it&
 check("leads: текст имени восстановлен",
   wEsc.document.querySelector("#leads-body tr td:nth-child(2)").textContent, "O'Brien");
 
+console.log("\n== 20. Длинная вставка в сумму (находка 4.2) ==");
+const amtLong = doc.querySelectorAll(".d-amount")[0];
+check("maxlength у поля суммы", amtLong.getAttribute("maxlength"), "20");
+typeAmount(amtLong, "9".repeat(100000));
+check("поле обрезано после вставки 100k", amtLong.value.length <= 30, "true");
+check("в поле остались только цифры/разделители", /[^\d ,]/.test(amtLong.value), "false");
+typeAmount(amtLong, "1500000");
+check("обычный ввод работает после обрезки", amtLong.value, "1 500 000");
+
 setTimeout(() => {
   check("вызов печати в новом окне", printCalled, "true");
   console.log("\n" + (failures === 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО: " + failures));

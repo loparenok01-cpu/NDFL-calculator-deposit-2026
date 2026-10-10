@@ -55,6 +55,10 @@ function round2(value) {
    дробная часть — через запятую. Caret восстанавливается по числу цифр. */
 function formatAmountInput(input) {
   input.addEventListener("input", () => {
+    // ограничиваем сырой ввод: регулярка группировки квадратична по длине строки
+    if (input.value.length > 20) {
+      input.value = input.value.slice(0, 20);
+    }
     const pos0 = input.selectionStart == null ? input.value.length : input.selectionStart;
     const digitsBefore = (input.value.slice(0, pos0).match(/\d/g) || []).length;
 
