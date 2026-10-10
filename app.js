@@ -8,6 +8,7 @@ const CONFIG = {
   DEFAULT_KEY_RATE: "16,00",
   P1M: 1000000,          // 1 000 000 ₽
   HIGH_THRESHOLD: 2400000, // 2 400 000 ₽
+  MAX_AMOUNT: 1e12,        // 1 трлн ₽ — разумный верх суммы процентов за год
   RATE_BASE: 0.13,
   RATE_HIGH: 0.15,
   LEAD_ENDPOINT: "",     // укажите URL эндпоинта; пусто = демо-режим (localStorage)
@@ -185,7 +186,7 @@ function validate(K, deposits) {
   const messages = [];
   const keys = [];
 
-  if (isNaN(K) || K <= 0 || K > 100) {
+  if (isNaN(K) || !isFinite(K) || K <= 0 || K > 100) {
     markInvalid(keyRateInput, true);
     messages.push("Ставка должна быть больше 0 и не больше 100.");
   } else {
@@ -205,6 +206,13 @@ function validate(K, deposits) {
     if (isNaN(dep.amount) || dep.amount < 0) {
       markInvalid(amountInput, true);
       messages.push("Вклад " + dep.index + ": введите неотрицательное число процентов.");
+      keys.push("amount" + i);
+    } else if (!isFinite(dep.amount) || dep.amount > CONFIG.MAX_AMOUNT) {
+      markInvalid(amountInput, true);
+      messages.push(
+        "Вклад " + dep.index + ": сумма не должна превышать " +
+        intFmt.format(CONFIG.MAX_AMOUNT) + " \u20BD."
+      );
       keys.push("amount" + i);
     } else {
       markInvalid(amountInput, false);

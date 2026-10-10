@@ -250,6 +250,34 @@ if (reportHtml) {
   check("в отчёте ключевая ставка", norm(reportHtml).includes("Ключеваяставка16%"), "true");
 }
 
+console.log("\n== 16. Огромные суммы, Infinity (находка 4.1) ==");
+r = calcTax(dom, ["9".repeat(310), "90000"], [RUB, RUB]);
+check("310 девяток: ошибки показаны", r.errors.length > 0, "true");
+check("310 девяток: результат скрыт", r.visible, "false");
+check("310 девяток: текст про превышение", r.errors.some((m) => m.includes("не должна превышать")), "true");
+check("310 девяток: поле помечено invalid", doc.querySelectorAll(".d-amount")[0].className.includes("invalid"), "true");
+
+const errorsHuge = [];
+const domHuge = load("index.html", "app.js", errorsHuge);
+const rHuge = calcTax(domHuge, ["9".repeat(310), "90000"]);
+check("свежая страница: ошибок при загрузке", errorsHuge.length, 0);
+check("свежая страница: налог без «∞»", rHuge.tax.includes("∞"), "false");
+check("свежая страница: база без «не число»", rHuge.base.includes("не число"), "false");
+
+r = calcTax(dom, ["1 000 000 000 000", "0"], [RUB, RUB]);
+check("ровно 10^12: ошибок нет", r.errors.length, 0);
+check("ровно 10^12: результат виден", r.visible, "true");
+
+r = calcTax(dom, ["1 000 000 000 000,01", "0"], [RUB, RUB]);
+check("10^12 + 0,01: текст про превышение", r.errors.some((m) => m.includes("не должна превышать")), "true");
+check("10^12 + 0,01: результат скрыт", r.visible, "false");
+
+doc.getElementById("key-rate").value = "Infinity";
+r = calcTax(dom, ["100000", "90000"], [RUB, RUB]);
+check("ставка Infinity: ошибка про ставку", r.errors.some((m) => m.includes("Ставка")), "true");
+check("ставка Infinity: результат скрыт", r.visible, "false");
+doc.getElementById("key-rate").value = "16";
+
 setTimeout(() => {
   check("вызов печати в новом окне", printCalled, "true");
   console.log("\n" + (failures === 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО: " + failures));
