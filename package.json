@@ -1,0 +1,13 @@
+{
+  "name": "kalkulator-ndfl-procent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Калькулятор НДФЛ с процентов по вкладам в 2026 году + кейс",
+  "scripts": {
+    "test": "node tests/test.js",
+    "test:case": "node tests/check-case.js"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.2"
+  }
+}
