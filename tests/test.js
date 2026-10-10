@@ -2,7 +2,7 @@
 const { JSDOM, VirtualConsole } = require("jsdom");
 const fs = require("fs");
 const path = require("path");
-const PATH = path.resolve(__dirname, "..") + path.sep;
+const PATH = path.resolve(__dirname, "..", "public") + path.sep;
 
 let failures = 0;
 function check(name, actual, expected) {
@@ -219,9 +219,11 @@ check("хранилище очищено", w2.localStorage.getItem("ndfl_leads_d
 console.log("\n== 14. Ссылки и ресурсы ==");
 check("ссылка на leads.html в index.html",
   fs.readFileSync(PATH + "index.html", "utf8").includes("leads.html"), "true");
-["index.html", "app.js", "leads.html", "leads.js", "styles.css", "ТЗ.md"].forEach((f) => {
+["index.html", "app.js", "leads.html", "leads.js", "styles.css"].forEach((f) => {
   check("файл существует: " + f, fs.existsSync(PATH + f), "true");
 });
+check("файл существует: docs/TZ.md",
+  fs.existsSync(path.resolve(__dirname, "..", "docs", "TZ.md")), "true");
 
 console.log("\n== 15. Печать отчёта в отдельном окне ==");
 let reportHtml = null;

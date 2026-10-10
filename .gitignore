@@ -18,3 +18,8 @@ Thumbs.db
 *.docx
 *.png
 Референс.jpg
+
+# Личные заметки и черновики
+*.local
+.idea/
+.vscode/

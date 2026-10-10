@@ -2,7 +2,7 @@
 const fs = require("fs");
 const { JSDOM } = require("jsdom");
 const path = require("path");
-const p = path.resolve(__dirname, "..", "Chellenge") + path.sep;
+const p = path.resolve(__dirname, "..", "case-study") + path.sep;
 const html = fs.readFileSync(p + "case-template.html", "utf8");
 
 const ph = html.match(/\[[^\]]{2,}\]/g) || [];
@@ -18,7 +18,7 @@ console.log("6. заглушек скриншотов:", d.querySelectorAll(".im
 console.log("7. mailto:", d.querySelector(".case-cta a").getAttribute("href"));
 console.log("8. style.css подключён:", !!d.querySelector('link[href="style.css"]'));
 console.log("9. цветов гаммы в inline-стиле:", (html.match(/2f7a3e|43a047|f7e37e|e7f3dc/g) || []).length);
-console.log("10. ../index.html существует:", fs.existsSync(p + "../index.html"));
+console.log("10. ../public/index.html существует:", fs.existsSync(p + "../public/index.html"));
 console.log("11. style.css существует:", fs.existsSync(p + "style.css"));
 
 ["Задача", "Целевая аудитория", "Проблема", "Решение", "Основные функции", "Использованные инструменты"].forEach((t) => {
