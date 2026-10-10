@@ -1,13 +1,36 @@
 {
-  "name": "kalkulator-ndfl-procent",
+  "name": "ndfl-calculator-deposit-2026",
   "version": "1.0.0",
   "private": true,
-  "description": "Калькулятор НДФЛ с процентов по вкладам в 2026 году + кейс",
+  "description": "Калькулятор НДФЛ с процентов по вкладам в 2026 году: лимит 1 000 000 ₽ × ключевая ставка, прогрессия 13 %/15 %, разбивка по вкладам и сбор заявки. HTML + CSS + vanilla JS, 120 автотестов.",
   "scripts": {
     "test": "node tests/test.js",
-    "test:case": "node tests/check-case.js"
+    "test:case": "node tests/check-case.js",
+    "deploy": "git subtree push --prefix public origin gh-pages"
   },
   "devDependencies": {
     "jsdom": "^30.1.2"
+  },
+  "keywords": [
+    "ndfl",
+    "налог",
+    "вклады",
+    "калькулятор",
+    "2026",
+    "бухгалтерия",
+    "uk",
+    "russia",
+    "calculator",
+    "vanilla-js"
+  ],
+  "author": "Elena Lopareva (Olleva) <l6344@list.ru>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loparenok01-cpu/NDFL-calculator-deposit-2026.git"
+  },
+  "homepage": "https://loparenok01-cpu.github.io/NDFL-calculator-deposit-2026/",
+  "bugs": {
+    "url": "https://github.com/loparenok01-cpu/NDFL-calculator-deposit-2026/issues"
   }
 }
